@@ -1,0 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Syne", "Plus Jakarta Sans", sans-serif;
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes slideInLeft {
+  from { transform: translateX(-40px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeInUp {
+  from { transform: translateY(28px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 10px 2px rgba(0, 192, 118, 0.15); }
+  50% { box-shadow: 0 0 22px 6px rgba(0, 192, 118, 0.35); }
+}
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes border-glow {
+  0%, 100% { border-color: rgba(0, 192, 118, 0.3); }
+  50% { border-color: rgba(0, 192, 118, 0.8); }
+}
+@keyframes count-up {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ========== UTILITY CLASSES ========== */
+.animate-slideInLeft { animation: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slideUp { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
+.animate-fadeInUp { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-float { animation: float 3.5s ease-in-out infinite; }
+.animate-glow-pulse { animation: glow-pulse 2.5s ease-in-out infinite; }
+.animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+/* Staggered animation delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+
+/* ========== SHIMMER TEXT ========== */
+.text-shimmer {
+  background: linear-gradient(90deg, #00C076, #00e490, #00C076, #7fff8c, #00C076);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ========== GLASS MORPHISM ========== */
+.glass {
+  background: rgba(11, 19, 41, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(34, 48, 74, 0.6);
+}
+.glass-light {
+  background: rgba(20, 33, 61, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ========== TICKER TAPE ========== */
+.ticker-tape {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 28s linear infinite;
+}
+.ticker-tape:hover { animation-play-state: paused; }
+
+/* ========== CHART CANVAS FIX - REMOVES BLUR ========== */
+canvas {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+/* High-DPI canvas sharpness fix */
+.chart-canvas-wrapper canvas {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== SCROLLBAR STYLING ========== */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0a0f1a; }
+::-webkit-scrollbar-thumb { background: #22304a; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #2d4268; }
+
+/* ========== BUTTON PRESS EFFECT ========== */
+.btn-press:active { transform: scale(0.97); }
+
+/* ========== GRADIENT BORDERS ========== */
+.gradient-border {
+  position: relative;
+  background: linear-gradient(#0b1329, #0b1329) padding-box,
+              linear-gradient(135deg, #00C076, #004d30) border-box;
+  border: 1px solid transparent;
+}
+
+/* ========== LANDING PAGE GRID OVERLAY ========== */
+.grid-overlay {
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ========== STAT COUNTER CARD ========== */
+.stat-card {
+  animation: count-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ========== MOBILE TOUCH OPTIMIZATION ========== */
+@media (max-width: 768px) {
+  button, a { -webkit-tap-highlight-color: transparent; }
+  
+  /* Prevent font size inflation on iOS */
+  html { -webkit-text-size-adjust: 100%; }
+  
+  /* Better mobile chart rendering */
+  .chart-canvas-wrapper {
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+}
+
+/* ========== LOGO GLOW ========== */
+.logo-glow {
+  filter: drop-shadow(0 0 8px rgba(0, 192, 118, 0.4));
+}
+
+/* ========== HERO GRADIENT ========== */
+.hero-gradient {
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0, 192, 118, 0.12) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0, 100, 200, 0.06) 0%, transparent 60%);
+}
+
+/* ========== CARD HOVER LIFT ========== */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 192, 118, 0.08);
+  border-color: rgba(0, 192, 118, 0.25) !important;
+}
+
+/* ========== DEPOSIT PAGE COPY BUTTON ========== */
+.copy-btn:active { transform: scale(0.9); }
+
+/* ========== NOTIFICATION BADGE PULSE ========== */
+.badge-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
