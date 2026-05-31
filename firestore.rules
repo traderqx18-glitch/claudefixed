@@ -1,0 +1,140 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Strictly validate User profile document shape
+    function isValidUser(data) {
+      return data.uid is string && data.uid.size() <= 128
+        && data.email is string && data.email.size() <= 256
+        && data.fullName is string && data.fullName.size() <= 128
+        && data.username is string && data.username.size() <= 128
+        && data.createdAt is string;
+    }
+
+    // Strictly validate Wallet document shape
+    function isValidWallet(data) {
+      return data.uid is string && data.uid.size() <= 128
+        && data.demoBalance is number
+        && data.liveBalance is number
+        && data.currency is string && data.currency.size() <= 10
+        && data.updatedAt is string;
+    }
+
+    // Strictly validate Trade document shape
+    function isValidTrade(data) {
+      return data.uid is string && data.uid.size() <= 128
+        && data.asset is string && data.asset.size() <= 64
+        && data.direction is string && data.direction.size() <= 10
+        && data.amount is number && data.amount > 0
+        && data.entryPrice is number
+        && data.expirySeconds is number && data.expirySeconds > 0
+        && data.status is string && data.status.size() <= 32
+        && data.openedAt is string;
+    }
+
+    // Strictly validate Transaction shape
+    function isValidTransaction(data) {
+      return (data.uid is string || data.userId is string)
+        && data.type is string
+        && data.amount is number
+        && data.createdAt is string;
+    }
+
+    // Strictly validate PromoCode shape
+    function isValidPromoCode(data) {
+      return data.code is string && data.code.size() <= 64
+        && data.bonusPercent is number
+        && data.active is bool;
+    }
+
+    // Strictly validate Deposit shape
+    function isValidDeposit(data) {
+      return (data.uid is string || data.userId is string)
+        && data.amount is number && data.amount > 0
+        && (data.paymentMethod is string || data.method is string)
+        && data.status is string && (data.status == 'pending' || data.status == 'approved' || data.status == 'rejected')
+        && data.createdAt is string;
+    }
+
+    // Strictly validate Withdrawal shape
+    function isValidWithdrawal(data) {
+      return (data.uid is string || data.userId is string)
+        && data.amount is number && data.amount > 0
+        && data.method is string
+        && data.status is string && (data.status == 'pending' || data.status == 'processing' || data.status == 'completed' || data.status == 'approved' || data.status == 'rejected' || data.status == 'cancelled')
+        && data.createdAt is string;
+    }
+
+    // Path Rules allowing sandboxed secure client execution based on Firebase Authentication state
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.uid == userId && isValidUser(incoming());
+      allow delete: if false;
+    }
+
+    match /wallets/{walletId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.uid == walletId && isValidWallet(incoming());
+      allow delete: if false;
+    }
+
+    match /trades/{tradeId} {
+      allow read, list: if true;
+      allow create: if request.auth != null && incoming().uid == request.auth.uid && isValidTrade(incoming());
+      allow update: if request.auth != null && existing().uid == request.auth.uid && incoming().uid == request.auth.uid && isValidTrade(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'closedAt', 'result'])
+      );
+      allow delete: if false;
+    }
+
+    match /transactions/{txId} {
+      allow read, list: if true;
+      allow create: if request.auth != null && incoming().uid == request.auth.uid && isValidTransaction(incoming());
+      allow update: if false; // Transactions are immutable ledger entries
+      allow delete: if false;
+    }
+
+    match /promo_codes/{codeId} {
+      allow read, list: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /deposits/{depositId} {
+      allow read, list: if true;
+      allow create: if request.auth != null && incoming().uid == request.auth.uid && isValidDeposit(incoming());
+      allow update: if request.auth != null && incoming().uid == existing().uid && isValidDeposit(incoming());
+      allow delete: if false;
+    }
+
+    match /withdrawals/{withdrawalId} {
+      allow read, list: if true;
+      allow create: if request.auth != null && incoming().uid == request.auth.uid && isValidWithdrawal(incoming());
+      allow update: if request.auth != null && incoming().uid == existing().uid && isValidWithdrawal(incoming());
+      allow delete: if false;
+    }
+
+    match /assets/{assetId} {
+      allow read, list: if true;
+      allow write: if true;
+    }
+
+    match /candles/{candleId} {
+      allow read, list: if true;
+      allow write: if true;
+    }
+  }
+}
